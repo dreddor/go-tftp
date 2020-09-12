@@ -813,6 +813,12 @@ func (c *conn) readFromNet() (net.Addr, error) {
 		if c.timer == nil {
 			c.timer = time.NewTimer(c.timeout)
 		} else {
+			if !c.timer.Stop() {
+				select {
+				case <-c.timer.C:
+				default:
+				}
+			}
 			c.timer.Reset(c.timeout)
 		}
 
