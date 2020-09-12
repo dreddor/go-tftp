@@ -757,6 +757,12 @@ func (c *conn) getAck() stateType {
 		return c.getAck // Read another datagram
 	}
 
+	// Disregard readFromNet errors here. At this point we have retrieved
+	// a datagram that needs to be validated and we will have recovered from
+	// any errors/timeouts that have occured. Any errors left in the
+	// conn will terminate the session after the buffer has been sent.
+	c.err = nil
+
 	// Validate received datagram
 	if err := c.rx.validate(); err != nil {
 		c.err = wrapError(err, "ACK validation failed")
